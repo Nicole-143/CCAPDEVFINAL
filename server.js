@@ -113,7 +113,7 @@ app.get('/logout', (req, res) => {
 
 app.use(express.urlencoded({ extended: true }));
 
-//post
+// Post
 
 app.post('/walkin/new', async (req, res) => {
     const { user, lab, date, startTime, endTime, purpose } = req.body;
@@ -284,6 +284,98 @@ app.post('/login', async (req, res) => {
     console.error(err);
     res.status(500).send('Error logging in');
   }
+});
+
+// Walk-in Reservations 
+app.get('/walkin', async (req, res) => {
+  const user = req.session.user;
+  if (!user || user.userType !== 'technician') return res.redirect('/login');
+  const walkins = await Reservation.find({ reservedByTechnician: true }).populate('user').populate('lab');
+  const labs = await Lab.find();
+  res.render('walkin', { walkins, labs });
+});
+
+app.post('/walkin', async (req, res) => {
+  const { studentId, labId, date, startTime, endTime, purpose } = req.body;
+  const student = await User.findOne({ studentId, userType: 'student' });
+  if (!student) return res.redirect('/walkin');
+  await Reservation.create({
+    user: student._id,
+    lab: labId,
+    seatNumber: 1,
+    date,
+    startTime,
+    endTime,
+    status: 'Pending',
+    purpose,
+    isAnonymous: false,
+    reservedByTechnician: true
+  });
+  res.redirect('/walkin');
+});
+
+app.post('/walkin/delete/:id', async (req, res) => {
+  await Reservation.findByIdAndDelete(req.params.id);
+  res.redirect('/walkin');
+});
+
+// Manage Reservations 
+app.get('/manage', async (req, res) => {
+  const user = req.session.user;
+  if (!user || user.userType !== 'technician') return res.redirect('/login');
+  const reservations = await Reservation.find().populate('user').populate('lab');
+  res.render('manage', { reservations });
+});
+
+app.post('/manage/approve/:id', async (req, res) => {
+  await Reservation.findByIdAndUpdate(req.params.id, { status: 'Approved' });
+  res.redirect('/manage');
+});
+
+app.post('/manage/complete/:id', async (req, res) => {
+  await Reservation.findByIdAndUpdate(req.params.id, { status: 'Completed' });
+  res.redirect('/manage');
+});
+
+app.post('/manage/cancel/:id', async (req, res) => {
+  await Reservation.findByIdAndUpdate(req.params.id, { status: 'Cancelled' });
+  res.redirect('/manage');
+});
+
+// Reservation Creation 
+app.post('/reservation', async (req, res) => {
+  const user = req.session.user;
+  if (!user || user.userType !== 'student') return res.redirect('/login');
+  const { labId, date, startTime, endTime, purpose } = req.body;
+  await Reservation.create({
+    user: user._id,
+    lab: labId,
+    seatNumber: 1,
+    date,
+    startTime,
+    endTime,
+    status: 'Pending',
+    purpose,
+    isAnonymous: false,
+    reservedByTechnician: false
+  });
+  res.redirect('/reservation');
+});
+
+// Reservation View 
+app.get('/reservation', async (req, res) => {
+  const user = req.session.user;
+  if (!user || user.userType !== 'student') return res.redirect('/login');
+  const reservations = await Reservation.find({ user: user._id }).populate('lab');
+  res.render('reservation', { reservations });
+});
+
+// Lab View
+app.get('/lab', async (req, res) => {
+  const user = req.session.user;
+  if (!user) return res.redirect('/login');
+  const labs = await Lab.find();
+  res.render('lab', { labs });
 });
 
 app.listen(3000, () => {
