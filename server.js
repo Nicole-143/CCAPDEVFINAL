@@ -29,11 +29,23 @@ const hbs = require('hbs');
 hbs.registerHelper('eq', function (a, b) {
   return a === b;
 });
-hbs.registerHelper('formatDate', function(date) {
-  return new Date(date).toLocaleDateString('en-PH', {
-    year: 'numeric', month: 'short', day: 'numeric'
-  });
+hbs.registerHelper('formatDateMDY', function(date) {
+  const d = new Date(date);
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const year = d.getFullYear();
+  return `${month}-${day}-${year}`;
 });
+
+hbs.registerHelper('formatDateISO', function(date) {
+  if (!date) return '';
+  const d = new Date(date);
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const year = d.getFullYear();
+  return `${year}-${month}-${day}`;
+});
+
 
 // Routes
 app.get('/', (req, res) => {
@@ -101,6 +113,26 @@ app.get('/walkin/new', async (req, res) => {
   res.render('walkin-new', { labs, students });
 });
 
+app.get('/walkin/edit/:id', async (req, res) => {
+  try {
+    const reservation = await Reservation.findById(req.params.id).populate('user').populate('lab');
+    const students = await User.find({ userType: 'student' });
+    const labs = await Lab.find();
+
+    
+    const times = [
+      "09:00", "10:00", "11:00", "12:00",
+      "13:00", "14:00", "15:00", "16:00", "17:00", "18:00"
+    ];
+
+    res.render('walkin-edit', { reservation, students, labs, times });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error loading reservation');
+  }
+});
+
+
 app.get('/logout', (req, res) => {
   req.session.destroy(err => {
     if (err) {
@@ -115,14 +147,29 @@ app.use(express.urlencoded({ extended: true }));
 
 //post
 
+app.post('/walkin/edit/:id', async (req, res) => {
+  const { user, lab, date, startTime, endTime, status } = req.body;
+  try {
+    await Reservation.findByIdAndUpdate(req.params.id, {
+      user,
+      lab, date,
+      startTime,
+      endTime,
+      status
+    });
+    res.redirect('/dashboard');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error updating reservation');
+  }
+});
+
 app.post('/walkin/new', async (req, res) => {
     const { user, lab, date, startTime, endTime, purpose } = req.body;
   console.log("Walk-in form data received:", req.body);
 
   try {
     
-    const startDateTime = new Date(`${date}T${startTime}`);
-    const endDateTime = new Date(`${date}T${endTime}`);
     const dateOnly = new Date(date);
     dateOnly.setHours(0, 0, 0, 0);
 
@@ -130,8 +177,8 @@ app.post('/walkin/new', async (req, res) => {
       user,
       lab,
       date: dateOnly,
-      startTime: startDateTime,
-      endTime: endDateTime,
+      startTime: startTime,
+      endTime: endTime,
       purpose,
       status: 'Approved',
       isWalkIn: true,
@@ -145,6 +192,15 @@ app.post('/walkin/new', async (req, res) => {
   }
 });
 
+app.post('/walkin/delete/:id', async (req, res) => {
+  try {
+    await Reservation.findByIdAndDelete(req.params.id);
+    res.redirect('/dashboard');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error deleting reservation');
+  }
+});
 
 app.post('/edit-profile/edit', async (req, res) => {
   const sessionUser = req.session.user;

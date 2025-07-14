@@ -45,12 +45,6 @@
             </a>
           </li>
           <li>
-            <a href="/walkin" class="nav-link text-white">
-              <i class="bi bi-person-plus me-2"></i>
-              Walk-in Reservations
-            </a>
-          </li>
-          <li>
             <a href="/manage" class="nav-link text-white">
               <i class="bi bi-gear me-2"></i>
               Manage Reservations
@@ -110,7 +104,7 @@
               <tr>
                 
                 <td>{{lab.name}}</td>
-                <td>{{formatDate startTime}} to {{formatDate endTime}}</td>
+                <td>{{startTime}} to {{endTime}}</td>
 
                 <td><span class="badge bg-success">{{status}}</span></td>
                 
@@ -161,6 +155,7 @@
             <tr>
               <th>Student</th>
               <th>Lab</th>
+              <th>Date</th>
               <th>Time</th>
               <th>Status</th>
               <th>Actions</th>
@@ -171,6 +166,7 @@
               <tr>
                 <td>{{user.firstName}} {{user.lastName}}</td>
                 <td>{{lab.name}}</td>
+                <td>{{formatDateMDY date}}</td>
                 <td>{{startTime}} - {{endTime}}</td>
                 <td><span class="badge bg-success">{{status}}</span></td>
                 <td>
