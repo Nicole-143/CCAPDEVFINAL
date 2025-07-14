@@ -72,7 +72,7 @@ app.get('/dashboard', async (req, res) => {
   try {
     let reservations;
     if (user.userType === 'student') {
- reservations = await Reservation.find({ user: user._id.toString() }).populate('lab');
+  reservations = await Reservation.find({ user: user._id }).populate('lab');
 
 
 } else {
@@ -95,6 +95,12 @@ app.get('/dashboard', async (req, res) => {
   }
 });
 
+app.get('/walkin/new', async (req, res) => {
+  const labs = await Lab.find();
+  const students = await User.find({ userType: 'student' });
+  res.render('walkin-new', { labs, students });
+});
+
 app.get('/logout', (req, res) => {
   req.session.destroy(err => {
     if (err) {
@@ -108,6 +114,37 @@ app.get('/logout', (req, res) => {
 app.use(express.urlencoded({ extended: true }));
 
 //post
+
+app.post('/walkin/new', async (req, res) => {
+    const { user, lab, date, startTime, endTime, purpose } = req.body;
+  console.log("Walk-in form data received:", req.body);
+
+  try {
+    
+    const startDateTime = new Date(`${date}T${startTime}`);
+    const endDateTime = new Date(`${date}T${endTime}`);
+    const dateOnly = new Date(date);
+    dateOnly.setHours(0, 0, 0, 0);
+
+    await Reservation.create({
+      user,
+      lab,
+      date: dateOnly,
+      startTime: startDateTime,
+      endTime: endDateTime,
+      purpose,
+      status: 'Approved',
+      isWalkIn: true,
+      reservedByTechnician: true
+    });
+
+    res.redirect('/dashboard');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error creating walk-in');
+  }
+});
+
 
 app.post('/edit-profile/edit', async (req, res) => {
   const sessionUser = req.session.user;
