@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Profile</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="container mt-5">
+    <h2>Edit Profile</h2>
+
+    {{#if error}}
+      <div class="alert alert-danger">{{error}}</div>
+    {{/if}}
+
+   <form action="/edit-profile/edit" method="POST">
+
+      <div class="mb-3">
+        <label for="firstName" class="form-label">First Name</label>
+        <input type="text" name="firstName" id="firstName" class="form-control" value="{{user.firstName}}" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="lastName" class="form-label">Last Name</label>
+        <input type="text" name="lastName" id="lastName" class="form-control" value="{{user.lastName}}" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="email" class="form-label">Email (DLSU)</label>
+        <input type="email" name="email" id="email" class="form-control" value="{{user.email}}" required>
+      </div>
+
+       <div class="password">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" name="password" id="password" class="form-control" value="{{user.password}}" required>
+      </div>
+
+      {{#if (eq user.userType "student")}}
+        <div class="mb-3">
+          <label for="idNumber" class="form-label">Student ID</label>
+          <input type="text" name="idNumber" id="idNumber" class="form-control" value="{{user.studentId}}" required>
+        </div>
+        <div class="mb-3">
+          <label for="area" class="form-label">Course</label>
+          <input type="text" name="area" id="area" class="form-control" value="{{user.course}}" required>
+        </div>
+      {{else}}
+        <div class="mb-3">
+          <label for="idNumber" class="form-label">Employee ID</label>
+          <input type="text" name="idNumber" id="idNumber" class="form-control" value="{{user.employeeId}}" required>
+        </div>
+        <div class="mb-3">
+          <label for="area" class="form-label">Department</label>
+          <input type="text" name="area" id="area" class="form-control" value="{{user.department}}" required>
+        </div>
+      {{/if}}
+
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+      <a href="/dashboard" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Available Labs - Lab Reservation System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css"/>
+  <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar bg-dark text-white">
+    <div class="d-flex flex-column p-3">
+      <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+        <i class="bi bi-building me-2"></i>
+        <span class="fs-4">Lab Reservation</span>
+      </a>
+      <hr/>
+      <ul class="nav nav-pills flex-column mb-auto" id="sidebarNav">
+        <li class="nav-item student-only d-none">
+          <a href="/dashboard" class="nav-link text-white">
+            <i class="bi bi-house-door me-2"></i> Dashboard
+          </a>
+        </li>
+        <li class="student-only d-none">
+          <a href="/reservation" class="nav-link text-white">
+            <i class="bi bi-calendar-check me-2"></i> My Reservations
+          </a>
+        </li>
+        <li class="student-only d-none">
+          <a href="/lab" class="nav-link active text-white">
+            <i class="bi bi-pc-display me-2"></i> Reserve a Lab
+          </a>
+        </li>
+        <li class="nav-item technician-only d-none">
+          <a href="/dashboard" class="nav-link text-white">
+            <i class="bi bi-house-door me-2"></i> Dashboard
+          </a>
+        </li>
+
+        
+        <li class="technician-only d-none">
+          <a href="/walkin" class="nav-link text-white">
+            <i class="bi bi-person-plus me-2"></i> Walk-in Reservations
+          </a>
+        </li>
+        <li class="technician-only d-none">
+          <a href="/manage" class="nav-link text-white">
+  <i class="bi bi-gear me-2"></i> Manage Reservations
+
+        </li>
+      </ul>
+      <hr/>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="container-fluid py-4">
+      <div class="row mb-4 align-items-center justify-content-end">
+        <div class="col-auto">
+          <div class="dropdown user-dropdown">
+            <a href="#" class="d-flex align-items-center text-black text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="https://via.placeholder.com/40" alt="User" class="rounded-circle me-2 user-img"/>
+              <strong id="userName" class="user-name">User Name</strong>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-light text-small shadow" aria-labelledby="dropdownUser1">
+              <li><a class="dropdown-item" href="profile.html">Profile</a></li>
+              <li><hr class="dropdown-divider"/></li>
+              <li><a class="dropdown-item" href="#" onclick="logout()">Sign out</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="custom-line"></div>
+      
+      <!-- Page Title -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <h1>Reserve A Lab</h1>
+          <p class="text-muted">Select a lab to view its schedule and make a reservation</p>
+        </div>
+      </div>
+
+      
+       <!-- Search -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <form class="row g-3 ">
+                                <div class="col-md-3">
+                                    <label for="labFilter" class="form-label">Lab</label>
+                                    <select class="form-select" id="labFilter">
+                                        <option value="">All Labs</option>
+                                        <option value="101">GK203 - Computer Lab</option>
+                                        <option value="102">SM211 - Engineering Lab</option>
+                                        <option value="103">GK204 - Computer Lab</option>
+                                        <option value="102">LS212 - Computer Lab</option>
+                                        <option value="103">LS229 - Computer Lab</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="dateFilter" class="form-label">Date</label>
+                                    <input type="date" class="form-control" id="dateFilter">
+                                </div>
+                                
+                                <div class="col-md-3">
+                                    <label for="searchFilter" class="form-label">Search</label>
+                                    <input type="text" class="form-control" id="searchFilter" placeholder="Student ID or Name">
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary">Show Availability</button>
+                                    <button type="reset" class="btn btn-secondary">Reset</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+      
+
+       <div class="custom-line"></div>
+      <!-- Lab Cards -->
+      <div class="dashboard-grid" id="labsContainer">
+    </div>
+  </div>
+
+  
+
+  <!-- Bootstrap -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
